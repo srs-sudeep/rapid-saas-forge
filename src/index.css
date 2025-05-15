@@ -75,6 +75,10 @@
   body {
     @apply bg-background text-foreground overflow-x-hidden;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 @layer components {
@@ -88,5 +92,62 @@
 
   .blur-container {
     @apply relative before:absolute before:w-[80%] before:h-[50%] before:-left-10 before:-top-10 before:bg-horizonx-600/30 before:blur-[100px] before:rounded-full before:z-0 after:absolute after:w-[60%] after:h-[40%] after:-right-10 after:-bottom-10 after:bg-horizonx-800/30 after:blur-[100px] after:rounded-full after:z-0;
+  }
+
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-105;
+  }
+
+  .story-link {
+    @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fade-in 0.6s ease-out forwards;
+  }
+  
+  .animate-scale-in {
+    animation: scale-in 0.5s ease-out forwards;
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse-slow 3s infinite;
   }
 }
