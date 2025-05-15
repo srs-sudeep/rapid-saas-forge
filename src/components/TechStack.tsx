@@ -1,22 +1,14 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { motion, useInView } from 'framer-motion';
 import { 
   Collapsible, 
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-
-import { 
-  Carousel, 
-  CarouselContent, 
-  CarouselItem, 
-  CarouselNext, 
-  CarouselPrevious 
-} from '@/components/ui/carousel';
 
 const frontendTech = [
   { name: 'React', description: 'UI component library', level: 90 },
@@ -46,101 +38,88 @@ const devOpsTech = [
 ];
 
 export const TechStack = () => {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-scale-in');
-            entry.target.classList.remove('opacity-0', 'translate-y-10');
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (cardRefs.current) {
-      cardRefs.current.forEach((card) => {
-        if (card) observer.observe(card);
-      });
-    }
-
-    return () => {
-      if (cardRefs.current) {
-        cardRefs.current.forEach((card) => {
-          if (card) observer.unobserve(card);
-        });
-      }
-    };
-  }, []);
+  const [activeTab, setActiveTab] = useState("frontend");
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
+  
+  const renderTechCards = (tech) => {
+    return tech.map((item, i) => (
+      <motion.div
+        key={item.name}
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+        transition={{ duration: 0.5, delay: i * 0.1 }}
+        className="w-full md:w-1/2 lg:w-1/3 p-2"
+      >
+        <Card className="border border-horizonx-200 hover:border-horizonx-400 hover:shadow-lg hover:shadow-horizonx-500/20 transition-all duration-300 h-full">
+          <CardContent className="p-6 flex flex-col items-center">
+            <div className="w-16 h-16 mb-4 rounded-full bg-horizonx-100 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-horizonx-500/20 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-horizonx-600 flex items-center justify-center text-white font-bold">
+                  {item.name.charAt(0)}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-xl font-bold mb-2">{item.name}</h3>
+            <p className="text-sm text-center text-muted-foreground mb-4">{item.description}</p>
+            <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
+              <motion.div 
+                className="bg-horizonx-500 h-2.5 rounded-full" 
+                initial={{ width: 0 }}
+                animate={isInView ? { width: `${item.level}%` } : { width: 0 }}
+                transition={{ duration: 1, delay: i * 0.1 + 0.5 }}
+              />
+            </div>
+            <div className="mt-2 text-xs text-muted-foreground">Efficiency: {item.level}%</div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    ));
+  };
 
   return (
-    <section id="tech-stack" ref={sectionRef} className="py-20">
+    <section id="tech-stack" ref={ref} className="py-20 bg-gradient-to-b from-secondary/30 to-background">
       <div className="container">
-        <div className="text-center mb-16 animate-fade-in">
-          <Badge className="mb-4">Tech Stack</Badge>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">
+        <div className="text-center mb-16">
+          <Badge className="mb-4" variant="outline">Tech Stack</Badge>
+          <motion.h2 
+            className="text-3xl md:text-4xl font-bold mb-4 gradient-text"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.5 }}
+          >
             Built with Modern Technologies
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          </motion.h2>
+          <motion.p 
+            className="text-muted-foreground text-lg max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             HorizonX integrates best-in-class libraries and tools to ensure your application 
             is robust, maintainable, and scalable.
-          </p>
+          </motion.p>
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <Tabs defaultValue="frontend" className="w-full">
+          <Tabs 
+            defaultValue="frontend" 
+            value={activeTab} 
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
             <TabsList className="grid w-full grid-cols-3 mb-8">
               <TabsTrigger value="frontend">Frontend</TabsTrigger>
               <TabsTrigger value="backend">Backend</TabsTrigger>
               <TabsTrigger value="devops">DevOps</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="frontend">
-              <div className="mb-8">
-                <Carousel className="w-full">
-                  <CarouselContent>
-                    {frontendTech.map((tech, i) => (
-                      <CarouselItem key={tech.name} className="md:basis-1/2 lg:basis-1/3">
-                        <div className="p-1">
-                          <Card 
-                            ref={el => cardRefs.current[i] = el}
-                            className="opacity-0 translate-y-10 transition-all duration-500 ease-out border border-horizonx-200 hover:border-horizonx-400 hover:shadow-lg hover:shadow-horizonx-500/20"
-                          >
-                            <CardContent className="p-6 flex flex-col items-center">
-                              <div className="w-16 h-16 mb-4 rounded-full bg-horizonx-100 flex items-center justify-center">
-                                <div className="w-12 h-12 rounded-full bg-horizonx-500/20 flex items-center justify-center">
-                                  <div className="w-8 h-8 rounded-full bg-horizonx-600 flex items-center justify-center text-white font-bold">
-                                    {tech.name.charAt(0)}
-                                  </div>
-                                </div>
-                              </div>
-                              <h3 className="text-xl font-bold mb-2">{tech.name}</h3>
-                              <p className="text-sm text-center text-muted-foreground mb-4">{tech.description}</p>
-                              <div className="w-full bg-muted rounded-full h-2.5">
-                                <div 
-                                  className="bg-horizonx-500 h-2.5 rounded-full animate-pulse-slow" 
-                                  style={{ width: `${tech.level}%` }}
-                                ></div>
-                              </div>
-                              <div className="mt-2 text-xs text-muted-foreground">Efficiency: {tech.level}%</div>
-                            </CardContent>
-                          </Card>
-                        </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <div className="hidden md:flex">
-                    <CarouselPrevious />
-                    <CarouselNext />
-                  </div>
-                </Carousel>
+            <TabsContent value="frontend" className="focus:outline-none">
+              <div className="flex flex-wrap -mx-2">
+                {renderTechCards(frontendTech)}
               </div>
 
-              <Collapsible className="w-full">
+              <Collapsible className="w-full mt-6">
                 <CollapsibleTrigger className="w-full">
                   <div className="flex items-center justify-center gap-2 p-2 rounded-md hover:bg-muted transition-colors">
                     <span className="text-sm font-medium">View key frontend features</span>
@@ -150,58 +129,27 @@ export const TechStack = () => {
                   </div>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="overflow-hidden">
-                  <div className="p-4 mt-2 border rounded-md bg-muted/50 text-sm space-y-2">
+                  <motion.div 
+                    className="p-4 mt-2 border rounded-md bg-muted/50 text-sm space-y-2"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                  >
                     <p><strong>Lightning-fast rendering</strong> with optimized React components</p>
                     <p><strong>Smart data fetching</strong> patterns with automatic caching and refetching</p>
                     <p><strong>Type-safe development</strong> with full TypeScript support</p>
                     <p><strong>Beautiful UI components</strong> with shadcn/ui and Tailwind CSS</p>
-                  </div>
+                  </motion.div>
                 </CollapsibleContent>
               </Collapsible>
             </TabsContent>
             
-            <TabsContent value="backend">
-              <div className="mb-8">
-                <Carousel className="w-full">
-                  <CarouselContent>
-                    {backendTech.map((tech, i) => (
-                      <CarouselItem key={tech.name} className="md:basis-1/2 lg:basis-1/3">
-                        <div className="p-1">
-                          <Card 
-                            ref={el => cardRefs.current[i + 6] = el}
-                            className="opacity-0 translate-y-10 transition-all duration-500 ease-out border border-horizonx-200 hover:border-horizonx-400 hover:shadow-lg hover:shadow-horizonx-500/20"
-                          >
-                            <CardContent className="p-6 flex flex-col items-center">
-                              <div className="w-16 h-16 mb-4 rounded-full bg-horizonx-100 flex items-center justify-center">
-                                <div className="w-12 h-12 rounded-full bg-horizonx-500/20 flex items-center justify-center">
-                                  <div className="w-8 h-8 rounded-full bg-horizonx-600 flex items-center justify-center text-white font-bold">
-                                    {tech.name.charAt(0)}
-                                  </div>
-                                </div>
-                              </div>
-                              <h3 className="text-xl font-bold mb-2">{tech.name}</h3>
-                              <p className="text-sm text-center text-muted-foreground mb-4">{tech.description}</p>
-                              <div className="w-full bg-muted rounded-full h-2.5">
-                                <div 
-                                  className="bg-horizonx-500 h-2.5 rounded-full animate-pulse-slow" 
-                                  style={{ width: `${tech.level}%` }}
-                                ></div>
-                              </div>
-                              <div className="mt-2 text-xs text-muted-foreground">Efficiency: {tech.level}%</div>
-                            </CardContent>
-                          </Card>
-                        </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <div className="hidden md:flex">
-                    <CarouselPrevious />
-                    <CarouselNext />
-                  </div>
-                </Carousel>
+            <TabsContent value="backend" className="focus:outline-none">
+              <div className="flex flex-wrap -mx-2">
+                {renderTechCards(backendTech)}
               </div>
 
-              <Collapsible className="w-full">
+              <Collapsible className="w-full mt-6">
                 <CollapsibleTrigger className="w-full">
                   <div className="flex items-center justify-center gap-2 p-2 rounded-md hover:bg-muted transition-colors">
                     <span className="text-sm font-medium">View key backend features</span>
@@ -211,58 +159,27 @@ export const TechStack = () => {
                   </div>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="overflow-hidden">
-                  <div className="p-4 mt-2 border rounded-md bg-muted/50 text-sm space-y-2">
+                  <motion.div 
+                    className="p-4 mt-2 border rounded-md bg-muted/50 text-sm space-y-2"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                  >
                     <p><strong>Asynchronous processing</strong> for maximum throughput</p>
                     <p><strong>Automatic API documentation</strong> with Swagger/OpenAPI</p>
                     <p><strong>Robust data validation</strong> with Pydantic schemas</p>
                     <p><strong>Database migrations</strong> with Alembic for smooth deployment</p>
-                  </div>
+                  </motion.div>
                 </CollapsibleContent>
               </Collapsible>
             </TabsContent>
             
-            <TabsContent value="devops">
-              <div className="mb-8">
-                <Carousel className="w-full">
-                  <CarouselContent>
-                    {devOpsTech.map((tech, i) => (
-                      <CarouselItem key={tech.name} className="md:basis-1/2 lg:basis-1/3">
-                        <div className="p-1">
-                          <Card 
-                            ref={el => cardRefs.current[i + 12] = el}
-                            className="opacity-0 translate-y-10 transition-all duration-500 ease-out border border-horizonx-200 hover:border-horizonx-400 hover:shadow-lg hover:shadow-horizonx-500/20"
-                          >
-                            <CardContent className="p-6 flex flex-col items-center">
-                              <div className="w-16 h-16 mb-4 rounded-full bg-horizonx-100 flex items-center justify-center">
-                                <div className="w-12 h-12 rounded-full bg-horizonx-500/20 flex items-center justify-center">
-                                  <div className="w-8 h-8 rounded-full bg-horizonx-600 flex items-center justify-center text-white font-bold">
-                                    {tech.name.charAt(0)}
-                                  </div>
-                                </div>
-                              </div>
-                              <h3 className="text-xl font-bold mb-2">{tech.name}</h3>
-                              <p className="text-sm text-center text-muted-foreground mb-4">{tech.description}</p>
-                              <div className="w-full bg-muted rounded-full h-2.5">
-                                <div 
-                                  className="bg-horizonx-500 h-2.5 rounded-full animate-pulse-slow" 
-                                  style={{ width: `${tech.level}%` }}
-                                ></div>
-                              </div>
-                              <div className="mt-2 text-xs text-muted-foreground">Efficiency: {tech.level}%</div>
-                            </CardContent>
-                          </Card>
-                        </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <div className="hidden md:flex">
-                    <CarouselPrevious />
-                    <CarouselNext />
-                  </div>
-                </Carousel>
+            <TabsContent value="devops" className="focus:outline-none">
+              <div className="flex flex-wrap -mx-2">
+                {renderTechCards(devOpsTech)}
               </div>
 
-              <Collapsible className="w-full">
+              <Collapsible className="w-full mt-6">
                 <CollapsibleTrigger className="w-full">
                   <div className="flex items-center justify-center gap-2 p-2 rounded-md hover:bg-muted transition-colors">
                     <span className="text-sm font-medium">View key DevOps features</span>
@@ -272,12 +189,17 @@ export const TechStack = () => {
                   </div>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="overflow-hidden">
-                  <div className="p-4 mt-2 border rounded-md bg-muted/50 text-sm space-y-2">
+                  <motion.div 
+                    className="p-4 mt-2 border rounded-md bg-muted/50 text-sm space-y-2"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                  >
                     <p><strong>One-command deployment</strong> with Docker Compose</p>
                     <p><strong>Smart API routing</strong> with Kong Gateway</p>
                     <p><strong>Comprehensive monitoring</strong> with ELK stack</p>
                     <p><strong>Scalable infrastructure</strong> with Kubernetes support</p>
-                  </div>
+                  </motion.div>
                 </CollapsibleContent>
               </Collapsible>
             </TabsContent>

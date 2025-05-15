@@ -1,5 +1,6 @@
 
 import React, { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 
 export const HorizonXLogo = ({ className }: { className?: string }) => {
   const logoRef = useRef<HTMLDivElement>(null);
@@ -18,8 +19,8 @@ export const HorizonXLogo = ({ className }: { className?: string }) => {
       const mouseY = e.clientY;
       
       // Calculate the movement factor (smaller number = more movement)
-      const moveFactorX = (mouseX - centerX) / 50;
-      const moveFactorY = (mouseY - centerY) / 50;
+      const moveFactorX = (mouseX - centerX) / 25;
+      const moveFactorY = (mouseY - centerY) / 25;
       
       // Apply the 3D rotation effect
       logoRef.current.style.transform = `perspective(500px) rotateY(${moveFactorX}deg) rotateX(${-moveFactorY}deg)`;
@@ -30,10 +31,11 @@ export const HorizonXLogo = ({ className }: { className?: string }) => {
       
       // Parallax effect on scroll
       const scrollPosition = window.scrollY;
-      logoRef.current.style.transform = `translateY(${scrollPosition * 0.02}px)`;
+      const parallaxValue = Math.min(scrollPosition * 0.02, 15);
+      logoRef.current.style.transform = `translateY(${parallaxValue}px)`;
       
       // Change pulse size on scroll
-      const pulseSize = 3 + Math.min(scrollPosition * 0.005, 2);
+      const pulseSize = 3 + Math.min(scrollPosition * 0.002, 3);
       pulseRef.current.style.width = `${pulseSize}px`;
       pulseRef.current.style.height = `${pulseSize}px`;
     };
@@ -50,21 +52,28 @@ export const HorizonXLogo = ({ className }: { className?: string }) => {
   }, []);
   
   return (
-    <div 
+    <motion.div 
       ref={logoRef}
-      className={`flex items-center font-bold text-2xl transition-transform duration-200 ${className}`}
+      className={`flex items-center font-bold text-2xl ${className}`}
       style={{ transformStyle: 'preserve-3d' }}
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <span className="bg-gradient-to-r from-horizonx-700 to-horizonx-500 bg-clip-text text-transparent hover-scale">
+      <motion.span 
+        className="bg-gradient-to-r from-horizonx-700 to-horizonx-500 bg-clip-text text-transparent"
+        whileHover={{ scale: 1.05 }}
+        transition={{ type: "spring", stiffness: 300 }}
+      >
         HORIZON
-      </span>
+      </motion.span>
       <span className="relative ml-1 text-horizonx-700">
         X
         <span 
           ref={pulseRef}
-          className="absolute top-0 -right-3 w-3 h-3 rounded-full bg-horizonx-500 opacity-75 animate-pulse"
-        ></span>
+          className="absolute top-0 -right-3 w-3 h-3 rounded-full bg-horizonx-500 animate-pulse"
+        />
       </span>
-    </div>
+    </motion.div>
   );
 };

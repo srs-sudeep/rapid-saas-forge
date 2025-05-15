@@ -2,6 +2,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Zap, Database, Server, GitBranch, Code, Lock } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const features = [
   {
@@ -36,13 +37,29 @@ const features = [
   },
 ];
 
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.3,
+    }
+  }
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } }
+};
+
 export const Features = () => {
   return (
-    <section id="features" className="py-20 bg-secondary/50">
+    <section id="features" className="py-20 bg-gradient-to-b from-background to-secondary/30">
       <div className="container">
         <div className="text-center mb-16">
-          <Badge className="mb-4">Features</Badge>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <Badge className="mb-4" variant="outline">Features</Badge>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 tracking-tight">
             Everything You Need to Build Modern Applications
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -51,20 +68,27 @@ export const Features = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+        >
           {features.map((feature, index) => (
-            <div 
+            <motion.div 
               key={index} 
-              className="feature-card flex flex-col h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+              className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl p-6 hover:border-horizonx-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-horizonx-400/20"
+              variants={item}
             >
-              <div className="p-3 mb-4 bg-primary/10 self-start rounded-lg">
+              <div className="p-3 mb-4 bg-horizonx-500/10 rounded-lg self-start w-fit">
                 {feature.icon}
               </div>
               <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-              <p className="text-muted-foreground flex-grow">{feature.description}</p>
-            </div>
+              <p className="text-muted-foreground">{feature.description}</p>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
