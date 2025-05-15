@@ -1,30 +1,10 @@
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Github } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export const Hero = () => {
-  const terminalRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      
-      terminalRefs.current.forEach((ref, index) => {
-        if (ref) {
-          // Create a staggered 3D effect based on scroll position
-          ref.style.transform = `translateY(${scrollY * 0.05 * (index + 1)}px) 
-                                 translateZ(${-20 * index}px) 
-                                 rotateX(${Math.min(scrollY * 0.02, 5)}deg)`;
-        }
-      });
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <section className="relative overflow-hidden pt-32 pb-16 md:pt-40 md:pb-24">
       <div className="container relative z-10">
@@ -64,7 +44,6 @@ export const Hero = () => {
           {[...Array(3)].map((_, i) => (
             <div 
               key={i}
-              ref={el => terminalRefs.current[i] = el}
               className={cn(
                 "absolute w-full bg-black/80 backdrop-blur-md rounded-xl border shadow-lg overflow-hidden",
                 i === 0 ? "z-30 opacity-100" : 
